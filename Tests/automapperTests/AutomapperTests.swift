@@ -2,13 +2,96 @@ import XCTest
 @testable import automapper
 
 final class AutomapperTests: XCTestCase {
-    func testExample() throws {
-        let network = Network(int: 99, str: nil, user: .init(id: 11))
-        let domain = try Domain.init(from: MirrorDecoder(value: network))
-        XCTAssertEqual(network.int, domain.int)
-        XCTAssertEqual(network.str, domain.str)
-        XCTAssertEqual(network.user.id, domain.user.id)
+
+    func testStruct() throws {
+
+        let from = From(id: 1, str: "str")
+
+        let to = try To.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from.id, to.id)
+        XCTAssertEqual(from.str, to.str)
     }
+
+    func testNestedStruct() throws {
+        let from = NestedFrom(from: From(id: 1, str: "str"))
+
+        let to = try NestedTo.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from.from.id, to.from.id)
+        XCTAssertEqual(from.from.str, to.from.str)
+    }
+
+    func testStructWithOptionalToOptional() throws {
+        let from = FromWithOpt(str: "str")
+        let to = try ToWithOpt.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from.str, to.str)
+    }
+
+    func testArray() throws {
+        let from = ToArray(arr: [1, 2, 3])
+        let to = try FromArray.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from.arr, to.arr)
+    }
+
+    func testDictionaryInStruct() throws {
+        let from = ToDict(dict: ["KEY": "VALUE",
+                                 "KEY2": "VALUE2"])
+        let to = try FromDict.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from.dict, to.dict)
+    }
+
+    func testInt() throws {
+        let from = 1
+        let to = try Int.init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from, to)
+    }
+
+    func testDictionary() throws {
+        let from =  ["KEY": "VALUE",
+                     "KEY2": "VALUE2"]
+        let to = try [String: String].init(from: MirrorDecoder(value: from))
+        XCTAssertEqual(from, to)
+    }
+}
+
+struct ToDict {
+    let dict: [String: String]
+}
+
+struct FromDict: Decodable {
+    let dict: [String: String]
+}
+
+struct ToArray {
+    let arr: [Int]
+}
+
+struct FromArray: Decodable {
+    let arr: [Int]
+}
+
+struct FromWithOpt {
+    let str: String?
+}
+struct ToWithOpt: Decodable {
+    let str: String?
+}
+
+struct NestedFrom {
+    let from: From
+}
+
+struct NestedTo: Decodable {
+    let from: To
+}
+
+struct From {
+    let id: Int
+    let str: String
+}
+
+struct To: Decodable {
+    let id: Int
+    let str: String
 }
 
 struct UserNetwork: Decodable {
@@ -29,11 +112,5 @@ struct Network: Decodable {
 struct Domain: Decodable {
     let int: Int
     let str: String?
-    let user: UserDomain
+    let user: UserDomain?
 }
-
-// Nested?
-// optional wrapping when A is nonoptional but B is optional
-// Array?
-// Dictionary?
-// Generic?
