@@ -6,7 +6,7 @@ public extension Decodable {
     }
 }
 
-struct NotImplemented<T>: Error {
+struct NotImplemented<T, Key>: Error {
     let location: String
     init(file: StaticString = #file, line: Int = #line) {
         self.location = "\(file):\(line)"
@@ -49,7 +49,7 @@ struct MirrorDecoder<Value>: Decoder {
 struct DictionaryDecodingContrainer<Key, Value>: KeyedDecodingContainerProtocol where Key: CodingKey  {
 
     func decodeNil(forKey key: Key) throws -> Bool {
-        fatalError()
+        throw NotImplemented<Never, Key>()
     }
 
     var codingPath: [CodingKey] = []
@@ -59,7 +59,7 @@ struct DictionaryDecodingContrainer<Key, Value>: KeyedDecodingContainerProtocol 
     let dict: [String: Value]
 
     func contains(_ key: Key) -> Bool {
-        fatalError()
+        dict[key.stringValue] != nil
     }
 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
@@ -67,19 +67,19 @@ struct DictionaryDecodingContrainer<Key, Value>: KeyedDecodingContainerProtocol 
     }
 
     func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 
     func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 
     func superDecoder() throws -> Decoder {
-        fatalError()
+        throw NotImplemented<Value, Never>()
     }
 
     func superDecoder(forKey key: Key) throws -> Decoder {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 }
 
@@ -100,19 +100,19 @@ struct MirrorUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     var currentIndex: Int = 0
 
     mutating func decodeNil() throws -> Bool {
-        fatalError()
+        throw NotImplemented<Never, Never>()
     }
 
     mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-        fatalError()
+        throw NotImplemented<Never, NestedKey>()
     }
 
     mutating func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-        fatalError()
+        throw NotImplemented<Never, Never>()
     }
 
     mutating func superDecoder() throws -> Decoder {
-        fatalError()
+        throw NotImplemented<Never, Never>()
     }
 }
 
@@ -163,22 +163,22 @@ struct MirrorKeyedDecodingContainer<Key, Value>: KeyedDecodingContainerProtocol 
     }
 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable, Key: Hashable {
-        fatalError()
+        throw NotImplemented<T, Key>()
     }
 
     func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 
     func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 
     func superDecoder() throws -> Decoder {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 
     func superDecoder(forKey key: Key) throws -> Decoder {
-        fatalError()
+        throw NotImplemented<Value, Key>()
     }
 }
