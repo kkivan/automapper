@@ -4,20 +4,15 @@ import XCTest
 final class AutomapperTests: XCTestCase {
 
     func testStruct() throws {
-
         let from = From(id: 1, str: "str")
-
         let to = try To.init(from: MirrorDecoder(value: from))
-        XCTAssertEqual(from.id, to.id)
-        XCTAssertEqual(from.str, to.str)
+        assert(from, to)
     }
 
     func testNestedStruct() throws {
         let from = NestedFrom(from: From(id: 1, str: "str"))
-
         let to = try NestedTo.init(from: MirrorDecoder(value: from))
-        XCTAssertEqual(from.from.id, to.from.id)
-        XCTAssertEqual(from.from.str, to.from.str)
+        assert(from.from, to.from)
     }
 
     func testStructWithOptionalToOptional() throws {
@@ -51,6 +46,29 @@ final class AutomapperTests: XCTestCase {
         let to = try [String: String].init(from: MirrorDecoder(value: from))
         XCTAssertEqual(from, to)
     }
+
+    func testDictionaryWithStructs() throws {
+        let from =  ["KEY": From(id: 1, str: "str1"),
+                     "KEY2": From(id: 2, str: "str2")]
+        let to = try [String: To].init(from: MirrorDecoder(value: from))
+        XCTAssertFalse(to.isEmpty)
+        from.forEach { key, value in
+            assert(value, to[key])
+        }
+    }
+
+    func testArrayOfStructs() throws {
+        let from =  [From(id: 1, str: "str1"),
+                     From(id: 2, str: "str2")]
+        let to = try [To].init(from: MirrorDecoder(value: from))
+        XCTAssertFalse(to.isEmpty)
+        zip(from, to).forEach(assert)
+    }
+}
+
+func assert(_ from: From, _ to: To?) {
+    XCTAssertEqual(from.id, to?.id)
+    XCTAssertEqual(from.str, to?.str)
 }
 
 struct ToDict {

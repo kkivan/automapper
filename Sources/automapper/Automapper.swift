@@ -1,5 +1,12 @@
 import Foundation
 
+struct NotImplemented<T>: Error {
+    let location: String
+    init(file: StaticString = #file, line: Int = #line) {
+        self.location = "\(file):\(line)"
+    }
+}
+
 struct MirrorDecoder<Value>: Decoder {
     var userInfo: [CodingUserInfoKey : Any] = [:]
     var codingPath: [CodingKey] = []
@@ -50,7 +57,7 @@ struct DictionaryDecodingContrainer<Key, Value>: KeyedDecodingContainerProtocol 
     }
 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
-        dict[key.stringValue] as! T
+        try T.init(from: MirrorDecoder(value: dict[key.stringValue]!))
     }
 
     func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
@@ -75,7 +82,7 @@ struct MirrorUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     var values: [Any]
 
     mutating func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
-        values.removeFirst() as! T
+        try T.init(from: MirrorDecoder(value: values.removeFirst()))
     }
 
     var codingPath: [CodingKey] = []
