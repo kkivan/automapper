@@ -63,7 +63,7 @@ struct DictionaryDecodingContrainer<Key, Value>: KeyedDecodingContainerProtocol 
     }
 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
-        try T.init(from: MirrorDecoder(value: dict[key.stringValue]!))
+        try T.init(from: MirrorDecoder(value: dict[key.stringValue]!)) // TODO: handle optional
     }
 
     func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
@@ -125,7 +125,7 @@ struct MirrorSingleValue<Value>: SingleValueDecodingContainer {
     }
 
     func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
-        return value as! T
+        return value as! T // TODO: handle optional
     }
 }
 
@@ -159,7 +159,7 @@ struct MirrorKeyedDecodingContainer<Key, Value>: KeyedDecodingContainerProtocol 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
         let child = childFor(key)
 
-        return try T.init(from: MirrorDecoder(value: child!))
+        return try T.init(from: MirrorDecoder(value: child!)) // TODO: handle optional
     }
 
     func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable, Key: Hashable {
