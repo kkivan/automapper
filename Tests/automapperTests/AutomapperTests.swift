@@ -5,52 +5,52 @@ final class AutomapperTests: XCTestCase {
 
     func testStruct() throws {
         let from = From(id: 1, str: "str")
-        let to = try To.init(from: MirrorDecoder(value: from))
+        let to = try To.automap(from)
         assert(from, to)
     }
 
     func testNestedStruct() throws {
         let from = NestedFrom(from: From(id: 1, str: "str"))
-        let to = try NestedTo.init(from: MirrorDecoder(value: from))
+        let to = try NestedTo.automap(from)
         assert(from.from, to.from)
     }
 
     func testStructWithOptionalToOptional() throws {
         let from = FromWithOpt(str: "str")
-        let to = try ToWithOpt.init(from: MirrorDecoder(value: from))
+        let to = try ToWithOpt.automap(from)
         XCTAssertEqual(from.str, to.str)
     }
 
     func testArray() throws {
         let from = ToArray(arr: [1, 2, 3])
-        let to = try FromArray.init(from: MirrorDecoder(value: from))
+        let to = try FromArray.automap(from)
         XCTAssertEqual(from.arr, to.arr)
     }
 
     func testDictionaryInStruct() throws {
         let from = ToDict(dict: ["KEY": "VALUE",
                                  "KEY2": "VALUE2"])
-        let to = try FromDict.init(from: MirrorDecoder(value: from))
+        let to = try FromDict.automap(from)
         XCTAssertEqual(from.dict, to.dict)
     }
 
     func testInt() throws {
         let from = 1
-        let to = try Int.init(from: MirrorDecoder(value: from))
+        let to = try Int.automap(from)
         XCTAssertEqual(from, to)
     }
 
     func testDictionary() throws {
         let from =  ["KEY": "VALUE",
                      "KEY2": "VALUE2"]
-        let to = try [String: String].init(from: MirrorDecoder(value: from))
+        let to = try [String: String].automap(from)
         XCTAssertEqual(from, to)
     }
 
     func testDictionaryWithStructs() throws {
         let from =  ["KEY": From(id: 1, str: "str1"),
                      "KEY2": From(id: 2, str: "str2")]
-        let to = try [String: To].init(from: MirrorDecoder(value: from))
+        let to = try [String: To].automap(from)
         XCTAssertFalse(to.isEmpty)
         from.forEach { key, value in
             assert(value, to[key])
@@ -60,7 +60,7 @@ final class AutomapperTests: XCTestCase {
     func testArrayOfStructs() throws {
         let from =  [From(id: 1, str: "str1"),
                      From(id: 2, str: "str2")]
-        let to = try [To].init(from: MirrorDecoder(value: from))
+        let to = try [To].automap(from)
         XCTAssertFalse(to.isEmpty)
         zip(from, to).forEach(assert)
     }

@@ -1,5 +1,11 @@
 import Foundation
 
+public extension Decodable {
+    static func automap<T>(_ value: T) throws -> Self  {
+        try Self.init(from: MirrorDecoder(value: value))
+    }
+}
+
 struct NotImplemented<T>: Error {
     let location: String
     init(file: StaticString = #file, line: Int = #line) {
