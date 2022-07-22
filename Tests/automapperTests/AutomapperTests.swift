@@ -64,6 +64,22 @@ final class AutomapperTests: XCTestCase {
         XCTAssertFalse(to.isEmpty)
         zip(from, to).forEach(assert)
     }
+
+    func testThatNoFieldMapsToNil() throws {
+        struct From {
+            let id: Int
+        }
+
+        struct To: Decodable {
+            let id: Int
+            let str: String?
+        }
+
+        let from = From(id: 1)
+        let to = try To.automap(from)
+        XCTAssertEqual(from.id, to.id)
+        XCTAssertNil(to.str)
+    }
 }
 
 func assert(_ from: From, _ to: To?) {
