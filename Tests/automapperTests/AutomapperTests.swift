@@ -66,7 +66,7 @@ final class AutomapperTests: XCTestCase {
     }
 
     func testThatNoFieldMapsToNil() throws {
-        struct From {
+        struct From: Encodable {
             let id: Int
         }
 
@@ -80,6 +80,18 @@ final class AutomapperTests: XCTestCase {
         XCTAssertEqual(from.id, to.id)
         XCTAssertNil(to.str)
     }
+
+    func testEnumWithAssociatedType() throws {
+        enum From: Encodable, Equatable {
+            case one(Int)
+        }
+        enum To: Decodable, Equatable {
+            case one(Int)
+        }
+        let from = From.one(9)
+        let to = try To.from(from)
+        XCTAssertEqual(to, To.one(9))
+    }
 }
 
 func assert(_ from: From, _ to: To?) {
@@ -87,7 +99,7 @@ func assert(_ from: From, _ to: To?) {
     XCTAssertEqual(from.str, to?.str)
 }
 
-struct ToDict {
+struct ToDict: Encodable {
     let dict: [String: String]
 }
 
@@ -95,7 +107,7 @@ struct FromDict: Decodable {
     let dict: [String: String]
 }
 
-struct ToArray {
+struct ToArray: Encodable {
     let arr: [Int]
 }
 
@@ -103,14 +115,14 @@ struct FromArray: Decodable {
     let arr: [Int]
 }
 
-struct FromWithOpt {
+struct FromWithOpt: Encodable {
     let str: String?
 }
 struct ToWithOpt: Decodable {
     let str: String?
 }
 
-struct NestedFrom {
+struct NestedFrom: Encodable {
     let from: From
 }
 
@@ -118,7 +130,7 @@ struct NestedTo: Decodable {
     let from: To
 }
 
-struct From {
+struct From: Encodable {
     let id: Int
     let str: String
 }
